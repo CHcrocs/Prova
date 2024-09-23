@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -29,20 +32,40 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.provacode.ui.theme.ProvaCodeTheme
+import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            LayoutMain()
+            Main()
+        }
+    }
+}
+
+@Composable
+fun Main() {
+    var navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "cadastro") {
+        composable("cadastro") { CadastroProduto(navController) }
+        composable("lista") { ListaProdutos(navController) }
+        composable("detalhes/{produtoJson}") { backStackEntry ->
+            val produtoJson = backStackEntry.arguments?.getString("produtoJson")
+            val produto = Gson().fromJson(produtoJson, Produto::class.java)
+            DetalhesProduto(navController, produto)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LayoutMain() {
+fun CadastroProduto(navController: NavController) {
 
     var nome by remember { mutableStateOf("") }
     var categoria by remember { mutableStateOf("") }
@@ -50,8 +73,6 @@ fun LayoutMain() {
     var quantEstoque by remember { mutableStateOf("") }
 
     val context = LocalContext.current
-
-    var listaProduto by remember { mutableStateOf(listOf<Produto>()) }
 
     Column(
         Modifier
@@ -95,19 +116,47 @@ fun LayoutMain() {
             // Verificação de parametros
             if (nome.isBlank() || categoria.isBlank() || preco.isBlank() || quantEstoque.isBlank()) {
                 Toast.makeText(context, "Preencher todos os campos!", Toast.LENGTH_SHORT).show()
-            }
-            else {
-                // Passagem de dados para uma lista
-                listaProduto += Produto(nome, categoria, preco.toFloat(), quantEstoque.toInt())
+            } else {
+                Produto.listaProduto =
+                    listOf(Produto(nome, categoria, preco.toFloat(), quantEstoque.toInt()))
 
-                // Limpeza de variaveis
-                nome = ""
-                categoria = ""
-                preco = ""
-                quantEstoque = ""
+                navController.navigate("lista")
             }
         }) {
             Text(text = "Cadastrar")
         }
     }
+}
+
+@Composable
+fun ListaProdutos(navController: NavController) {
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(15.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        LazyColumn() {
+            items(Produto.listaProduto) { produto ->
+                Text(text = "${produto.nome} - (${produto.quantEstoque})")
+                Button(onClick = {
+                    val produtoJson = Gson().toJson(Produto.listaProduto)
+                    navController.navigate("detalhes/$produtoJson")
+                }) {
+                    Text(text = "Detalhes")
+                }
+            }
+        }
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text(text = "Cadastrar outro produto")
+        }
+    }
+}
+
+@Composable
+fun DetalhesProduto(navController: NavController, produto: Produto) {
+
 }
