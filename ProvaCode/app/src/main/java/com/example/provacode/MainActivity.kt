@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -141,7 +142,7 @@ fun ListaProdutos(navController: NavController) {
 
         LazyColumn() {
             items(Produto.listaProduto) { produto ->
-                Text(text = "${produto.nome} - (${produto.quantEstoque} unidades)", Modifier.clickable {  })
+                Text(text = "${produto.nome} - (${produto.quantEstoque} unidades)", fontSize = 15.sp)
                 Button(onClick = {
                     val produtoJson = Gson().toJson(produto)
                     navController.navigate("detalhes/$produtoJson")
@@ -150,7 +151,7 @@ fun ListaProdutos(navController: NavController) {
                 }
             }
         }
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         Button(onClick = { navController.popBackStack() }) {
             Text(text = "Cadastrar outro produto")
@@ -164,10 +165,10 @@ fun DetalhesProduto(navController: NavController, produto: Produto  ) {
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Nome: ${produto.nome}")
-        Text(text = "Categoria: ${produto.categoria}")
-        Text(text = "Preço: ${produto.preco}")
-        Text(text = "Quantidade: ${produto.quantEstoque}")
+        Text(text = "Nome: ${produto.nome}", fontSize = 20.sp)
+        Text(text = "Categoria: ${produto.categoria}", fontSize = 20.sp)
+        Text(text = "Preço: ${produto.preco}", fontSize = 20.sp)
+        Text(text = "Quantidade: ${produto.quantEstoque}", fontSize = 20.sp)
 
         Button(onClick = {
             navController.popBackStack()
