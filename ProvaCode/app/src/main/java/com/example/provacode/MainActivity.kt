@@ -162,14 +162,16 @@ fun ListaProdutos(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(25.dp))
 
+        Button(onClick = {
+            navController.navigate("estatisticas")
+        }) {
+            Text(text = "Estatísticas")
+        }
+
         Button(onClick = { navController.popBackStack() }) {
             Text(text = "Cadastrar outro produto")
         }
-        Button(onClick = {
-            navController.navigate("estatistica")
-        }) {
-            Text(text = "Estatisticas")
-        }
+
     }
 }
 
@@ -199,6 +201,14 @@ fun Estatisticas(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "${Estoque.calcularValorTotalEstoque()} é o valor total do estoques")
+        Text(text = "${Estoque.calcularValorTotalEstoque()} é o valor total do estoques", fontSize = 20.sp)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(text = "Atualmente possuimos ${Estoque.quantidadeTotalProdutos()} produtos", fontSize = 20.sp)
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text(text = "Voltar")
+        }
     }
 }
