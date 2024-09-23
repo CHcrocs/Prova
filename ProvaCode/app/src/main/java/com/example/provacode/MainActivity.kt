@@ -62,6 +62,7 @@ fun Main() {
 
             DetalhesProduto(navController, produto)
         }
+        composable("estatisticas") { Estatisticas(navController) }
     }
 }
 
@@ -118,9 +119,14 @@ fun CadastroProduto(navController: NavController) {
             // Verificação de parametros
             if (nome.isBlank() || categoria.isBlank() || preco.isBlank() || quantEstoque.isBlank()) {
                 Toast.makeText(context, "Preencher todos os campos!", Toast.LENGTH_SHORT).show()
+            } else if (quantEstoque.toInt() < 1) {
+                Toast.makeText(context, "Quantidade não pode ser menor que 1!", Toast.LENGTH_SHORT)
+                    .show()
+            } else if (preco.toFloat() < 0) {
+                Toast.makeText(context, "Preço não pode ser menor que 0!", Toast.LENGTH_SHORT)
+                    .show()
             } else {
-                Produto.listaProduto +=
-                    listOf(Produto(nome, categoria, preco.toFloat(), quantEstoque.toInt()))
+                Estoque.adicionarProdutos(nome, categoria, preco.toFloat(), quantEstoque.toInt())
 
                 navController.navigate("lista")
             }
@@ -141,8 +147,11 @@ fun ListaProdutos(navController: NavController) {
     ) {
 
         LazyColumn() {
-            items(Produto.listaProduto) { produto ->
-                Text(text = "${produto.nome} - (${produto.quantEstoque} unidades)", fontSize = 15.sp)
+            items(Estoque.listaEstoque) { produto ->
+                Text(
+                    text = "${produto.nome} - (${produto.quantEstoque} unidades)",
+                    fontSize = 15.sp
+                )
                 Button(onClick = {
                     val produtoJson = Gson().toJson(produto)
                     navController.navigate("detalhes/$produtoJson")
@@ -156,11 +165,16 @@ fun ListaProdutos(navController: NavController) {
         Button(onClick = { navController.popBackStack() }) {
             Text(text = "Cadastrar outro produto")
         }
+        Button(onClick = {
+            navController.navigate("estatistica")
+        }) {
+            Text(text = "Estatisticas")
+        }
     }
 }
 
 @Composable
-fun DetalhesProduto(navController: NavController, produto: Produto  ) {
+fun DetalhesProduto(navController: NavController, produto: Produto) {
     Column(
         Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -175,5 +189,16 @@ fun DetalhesProduto(navController: NavController, produto: Produto  ) {
         }) {
             Text(text = "Voltar")
         }
+    }
+}
+
+@Composable
+fun Estatisticas(navController: NavController) {
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "${Estoque.calcularValorTotalEstoque()} é o valor total do estoques")
     }
 }

@@ -1,12 +1,8 @@
 package com.example.provacode
 
 data class Produto(
-    val nome: String,
-    val categoria: String,
-    val preco: Float,
-    val quantEstoque: Int
-){
-    companion object{
-        var listaProduto = listOf<Produto>()
-    }
-}
+    var nome: String,
+    var categoria: String,
+    var preco: Float,
+    var quantEstoque: Int
+)
