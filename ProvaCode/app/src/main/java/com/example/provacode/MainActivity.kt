@@ -58,6 +58,7 @@ fun Main() {
         composable("detalhes/{produtoJson}") { backStackEntry ->
             val produtoJson = backStackEntry.arguments?.getString("produtoJson")
             val produto = Gson().fromJson(produtoJson, Produto::class.java)
+
             DetalhesProduto(navController, produto)
         }
     }
@@ -117,7 +118,7 @@ fun CadastroProduto(navController: NavController) {
             if (nome.isBlank() || categoria.isBlank() || preco.isBlank() || quantEstoque.isBlank()) {
                 Toast.makeText(context, "Preencher todos os campos!", Toast.LENGTH_SHORT).show()
             } else {
-                Produto.listaProduto =
+                Produto.listaProduto +=
                     listOf(Produto(nome, categoria, preco.toFloat(), quantEstoque.toInt()))
 
                 navController.navigate("lista")
@@ -140,15 +141,16 @@ fun ListaProdutos(navController: NavController) {
 
         LazyColumn() {
             items(Produto.listaProduto) { produto ->
-                Text(text = "${produto.nome} - (${produto.quantEstoque})")
+                Text(text = "${produto.nome} - (${produto.quantEstoque} unidades)", Modifier.clickable {  })
                 Button(onClick = {
-                    val produtoJson = Gson().toJson(Produto.listaProduto)
+                    val produtoJson = Gson().toJson(produto)
                     navController.navigate("detalhes/$produtoJson")
                 }) {
                     Text(text = "Detalhes")
                 }
             }
         }
+        Spacer(modifier = Modifier.height(30.dp))
 
         Button(onClick = { navController.popBackStack() }) {
             Text(text = "Cadastrar outro produto")
@@ -157,6 +159,20 @@ fun ListaProdutos(navController: NavController) {
 }
 
 @Composable
-fun DetalhesProduto(navController: NavController, produto: Produto) {
+fun DetalhesProduto(navController: NavController, produto: Produto  ) {
+    Column(
+        Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Nome: ${produto.nome}")
+        Text(text = "Categoria: ${produto.categoria}")
+        Text(text = "Preço: ${produto.preco}")
+        Text(text = "Quantidade: ${produto.quantEstoque}")
 
+        Button(onClick = {
+            navController.popBackStack()
+        }) {
+            Text(text = "Voltar")
+        }
+    }
 }
